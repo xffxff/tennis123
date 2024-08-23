@@ -1,13 +1,14 @@
 import re
+from typing import List
 
-from tennis123.data import Tournament
+from tennis123.data import Match, Tournament
 
 
-def count_game_wins_and_losses(tournament: Tournament, player_name):
+def count_game_wins_and_losses(matches: List[Match], player_name):
     wins = 0
     losses = 0
 
-    for match in tournament.matches:
+    for match in matches:
         if player_name in match.players:
             player1, player2 = match.players.split(" VS ")
             # Use regex to remove any parentheses and content within them
@@ -27,11 +28,11 @@ def count_game_wins_and_losses(tournament: Tournament, player_name):
     return wins, losses
 
 
-def count_match_wins_and_losses(tournament: Tournament, player_name):
+def count_match_wins_and_losses(matches: List[Match], player_name):
     wins = 0
     losses = 0
 
-    for match in tournament.matches:
+    for match in matches:
         if player_name in match.players:
             if match.winner == player_name:
                 wins += 1
@@ -46,15 +47,33 @@ def _win_rate(wins, losses):
     return wins / (wins + losses) * 100
 
 
-def calculate_match_win_rate(player_name, tournament, return_total=False):
-    wins, losses = count_match_wins_and_losses(tournament, player_name)
+def sort_matches_by_start_time(matches, reverse=False):
+    return sorted(matches, key=lambda match: match.start_time, reverse=reverse)
+
+
+def calculate_match_win_rate(
+    player_name, tournament: Tournament, last_n_matches=None, return_total=False
+):
+    matches = sort_matches_by_start_time(tournament.matches)
+
+    if last_n_matches:
+        matches = matches[-last_n_matches:]
+
+    wins, losses = count_match_wins_and_losses(matches, player_name)
     if return_total:
         return _win_rate(wins, losses), wins + losses
     return _win_rate(wins, losses)
 
 
-def calculate_game_win_rate(player_name, tournament, return_total=False):
-    wins, losses = count_game_wins_and_losses(tournament, player_name)
+def calculate_game_win_rate(
+    player_name, tournament: Tournament, last_n_matches=None, return_total=False
+):
+    matches = sort_matches_by_start_time(tournament.matches)
+
+    if last_n_matches:
+        matches = matches[-last_n_matches:]
+
+    wins, losses = count_game_wins_and_losses(matches, player_name)
     if return_total:
         return _win_rate(wins, losses), wins + losses
     return _win_rate(wins, losses)

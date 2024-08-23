@@ -84,7 +84,7 @@ def extract_start_time(soup):
     return None
 
 
-def extract_match_data(soup):
+def extract_match_data(soup, player_name):
     """Extracts match data from a match soup object."""
     start_time = extract_start_time(soup)
 
@@ -95,6 +95,8 @@ def extract_match_data(soup):
         tds = row.find_all("td")
         if len(tds) >= 5:
             players = tds[0].get_text(strip=True).replace("VS", " VS ")
+            if player_name not in players:
+                continue
             score = tds[1].get_text(strip=True)
             winner = tds[2].get_text(strip=True)
             group_info = tds[4].get_text(strip=True)
@@ -106,6 +108,7 @@ def extract_match_data(soup):
 
 def main():
     tournament = Tournament()
+    player_name = "xffxff"
 
     if os.path.exists(DATA_FILE):
         print("Loading matches from local file...")
@@ -118,7 +121,7 @@ def main():
         for match_url in match_links:
             print(f"Getting match details from {match_url}")
             match_soup = get_soup(match_url)
-            match_data = extract_match_data(match_soup)
+            match_data = extract_match_data(match_soup, player_name)
             for match in match_data:
                 tournament.add_match(match)
 
@@ -126,7 +129,6 @@ def main():
 
     # tournament.display_matches()
 
-    player_name = "xffxff"
     match_win_rate, total_matches = analysis.calculate_match_win_rate(
         player_name, tournament, return_total=True
     )
@@ -138,6 +140,21 @@ def main():
     )
     print(
         f"Game win rate for {player_name} is {game_win_rate:.2f}% over {total_games} games."
+    )
+
+    last_n_matches = 30
+    last_n_match_win_rate = analysis.calculate_match_win_rate(
+        player_name, tournament, last_n_matches, return_total=False
+    )
+    print(
+        f"Match win rate for {player_name} in the last {last_n_matches} matches is {last_n_match_win_rate:.2f}%."
+    )
+
+    last_n_match_game_win_rate, total_games = analysis.calculate_game_win_rate(
+        player_name, tournament, last_n_matches, return_total=True
+    )
+    print(
+        f"Game win rate for {player_name} in the last {last_n_matches} matches is {last_n_match_game_win_rate:.2f}% over {total_games} games."
     )
 
 

@@ -19,6 +19,7 @@ priority = "primary"
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
 isort = "^5.13.2"
+ipdb = "^0.13.13"
 
 [tool.black]
 line-length = 88
