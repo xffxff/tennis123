@@ -40,15 +40,20 @@ def count_match_wins_and_losses(tournament: Tournament, player_name):
     return wins, losses
 
 
-def calculate_match_win_rate(player_name, tournament):
+def _win_rate(wins, losses):
+    if wins + losses == 0:
+        return 0
+    return wins / (wins + losses) * 100
+
+def calculate_match_win_rate(player_name, tournament, return_total=False):
     wins, losses = count_match_wins_and_losses(tournament, player_name)
-    if wins + losses == 0:
-        return 0
-    return wins / (wins + losses) * 100
+    if return_total:
+        return _win_rate(wins, losses), wins + losses
+    return _win_rate(wins, losses)
 
 
-def calculate_game_win_rate(player_name, tournament):
+def calculate_game_win_rate(player_name, tournament, return_total=False):
     wins, losses = count_game_wins_and_losses(tournament, player_name)
-    if wins + losses == 0:
-        return 0
-    return wins / (wins + losses) * 100
+    if return_total:
+        return _win_rate(wins, losses), wins + losses
+    return _win_rate(wins, losses)

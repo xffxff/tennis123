@@ -124,13 +124,17 @@ def main():
 
         save_matches_to_file(tournament.matches, DATA_FILE)
 
-    tournament.display_matches()
+    # tournament.display_matches()
 
     player_name = "xffxff"
-    match_win_rate = analysis.calculate_match_win_rate(player_name, tournament)
-    game_win_rate = analysis.calculate_game_win_rate(player_name, tournament)
-    print(f"Match win rate for {player_name}: {match_win_rate:.2f}%")
-    print(f"Game win rate for {player_name}: {game_win_rate:.2f}%")
+    match_win_rate, total_matches = analysis.calculate_match_win_rate(
+        player_name, tournament, return_total=True
+    )
+    print(f"Match win rate for {player_name} is {match_win_rate:.2f}% over {total_matches} matches.")
+    game_win_rate, total_games = analysis.calculate_game_win_rate(
+        player_name, tournament, return_total=True
+    )
+    print(f"Game win rate for {player_name} is {game_win_rate:.2f}% over {total_games} games.")
 
 
 if __name__ == "__main__":
