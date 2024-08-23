@@ -88,6 +88,21 @@ def extract_match_data(soup):
     
     return match_data
 
+def calculate_win_rate(player_name, tournament):
+    total_matches = 0
+    victories = 0
+
+    for match in tournament:
+        if player_name in match.players:
+            total_matches += 1
+            if match.winner == player_name:
+                victories += 1
+    
+    if total_matches == 0:
+        return 0.0
+    else:
+        return (victories / total_matches) * 100
+
 def main():
     tournament = Tournament()
     main_soup = get_soup(MATCH_URL)
@@ -101,6 +116,10 @@ def main():
             tournament.add_match(match)
     
     tournament.display_matches()
+
+    player_name = "xffxff"
+    win_rate = calculate_win_rate(player_name, tournament)
+    print(f"{player_name}'s win rate: {win_rate:.2f}%")
 
 if __name__ == "__main__":
     main()
