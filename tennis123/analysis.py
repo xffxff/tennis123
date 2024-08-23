@@ -45,6 +45,7 @@ def _win_rate(wins, losses):
         return 0
     return wins / (wins + losses) * 100
 
+
 def calculate_match_win_rate(player_name, tournament, return_total=False):
     wins, losses = count_match_wins_and_losses(tournament, player_name)
     if return_total:

@@ -130,11 +130,15 @@ def main():
     match_win_rate, total_matches = analysis.calculate_match_win_rate(
         player_name, tournament, return_total=True
     )
-    print(f"Match win rate for {player_name} is {match_win_rate:.2f}% over {total_matches} matches.")
+    print(
+        f"Match win rate for {player_name} is {match_win_rate:.2f}% over {total_matches} matches."
+    )
     game_win_rate, total_games = analysis.calculate_game_win_rate(
         player_name, tournament, return_total=True
     )
-    print(f"Game win rate for {player_name} is {game_win_rate:.2f}% over {total_games} games.")
+    print(
+        f"Game win rate for {player_name} is {game_win_rate:.2f}% over {total_games} games."
+    )
 
 
 if __name__ == "__main__":
