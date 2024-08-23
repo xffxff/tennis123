@@ -1,9 +1,12 @@
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
+import json
+import os
 
 BASE_URL = "https://www.tennis123.net"
 MATCH_URL = f"{BASE_URL}/member/match92575_Singles_r30"
+DATA_FILE = "matches.json"
 
 class Match:
     def __init__(self, players, score, winner, info, start_time):
@@ -32,6 +35,35 @@ class Tournament:
     def display_matches(self):
         for match in self.matches:
             print(match)
+
+
+def save_matches_to_file(matches, filename):
+    with open(filename, 'w') as file:
+        json_matches = [
+            {
+                "players": match.players,
+                "score": match.score,
+                "winner": match.winner,
+                "info": match.info,
+                "start_time": match.start_time
+            }
+        for match in matches]
+        json.dump(json_matches, file)
+
+
+def load_matches_from_file(filename):
+    with open(filename, 'r') as file:
+        json_matches = json.load(file)
+        matches = [
+            Match(
+                match["players"],
+                match["score"],
+                match["winner"],
+                match["info"],
+                match["start_time"]
+            )
+            for match in json_matches]
+    return matches
 
 def get_soup(url):
     """Fetches the URL and returns a BeautifulSoup object."""
@@ -105,15 +137,23 @@ def calculate_win_rate(player_name, tournament):
 
 def main():
     tournament = Tournament()
-    main_soup = get_soup(MATCH_URL)
-    match_links = extract_match_links(main_soup)
 
-    for match_url in match_links:
-        print(f"Getting match details from {match_url}")
-        match_soup = get_soup(match_url)
-        match_data = extract_match_data(match_soup)
-        for match in match_data:
-            tournament.add_match(match)
+    if os.path.exists(DATA_FILE):
+        print("Loading matches from local file...")
+        tournament.matches = load_matches_from_file(DATA_FILE)
+    else:
+        print("Scraping matches from web...")
+        main_soup = get_soup(MATCH_URL)
+        match_links = extract_match_links(main_soup)
+
+        for match_url in match_links:
+            print(f"Getting match details from {match_url}")
+            match_soup = get_soup(match_url)
+            match_data = extract_match_data(match_soup)
+            for match in match_data:
+                tournament.add_match(match)
+
+        save_matches_to_file(tournament.matches, DATA_FILE)
     
     tournament.display_matches()
 
