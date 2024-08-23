@@ -18,8 +18,8 @@ if response.status_code == 200:
     # 假设要爬取某个特定的元素，例如会员的信息
     # 你需要根据实际的HTML结构调整下面的代码
     # 例如：
-    member_info = soup.find('div', class_='member-info')
-    
+    member_info = soup.find("div", class_="member-info")
+
     if member_info:
         print(member_info.text)
     else:
