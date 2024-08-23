@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 from datetime import datetime
@@ -7,10 +8,9 @@ from bs4 import BeautifulSoup
 
 from tennis123 import analysis
 from tennis123.data import Match, Tournament
+from tennis123.scrape.user import get_user_id
 
 BASE_URL = "https://www.tennis123.net"
-MATCH_URL = f"{BASE_URL}/member/match92575_Singles_r30"
-DATA_FILE = "matches.json"
 
 
 def save_matches_to_file(matches, filename):
@@ -25,7 +25,7 @@ def save_matches_to_file(matches, filename):
             }
             for match in matches
         ]
-        json.dump(json_matches, file)
+        json.dump(json_matches, file, ensure_ascii=False, indent=4)
 
 
 def load_matches_from_file(filename):
@@ -106,16 +106,20 @@ def extract_match_data(soup, player_name):
     return match_data
 
 
-def main():
+def main(player_name, last_n_matches):
     tournament = Tournament()
     player_name = "xffxff"
 
-    if os.path.exists(DATA_FILE):
+    user_id = get_user_id(player_name)
+    match_url = f"{BASE_URL}/member/match{user_id}_Singles_r30"
+
+    cache_data_file = f"{player_name}_matches.json"
+    if os.path.exists(cache_data_file):
         print("Loading matches from local file...")
-        tournament.matches = load_matches_from_file(DATA_FILE)
+        tournament.matches = load_matches_from_file(cache_data_file)
     else:
         print("Scraping matches from web...")
-        main_soup = get_soup(MATCH_URL)
+        main_soup = get_soup(match_url)
         match_links = extract_match_links(main_soup)
 
         for match_url in match_links:
@@ -125,7 +129,7 @@ def main():
             for match in match_data:
                 tournament.add_match(match)
 
-        save_matches_to_file(tournament.matches, DATA_FILE)
+        save_matches_to_file(tournament.matches, cache_data_file)
 
     # tournament.display_matches()
 
@@ -142,21 +146,32 @@ def main():
         f"Game win rate for {player_name} is {game_win_rate:.2f}% over {total_games} games."
     )
 
-    last_n_matches = 30
-    last_n_match_win_rate = analysis.calculate_match_win_rate(
-        player_name, tournament, last_n_matches, return_total=False
-    )
-    print(
-        f"Match win rate for {player_name} in the last {last_n_matches} matches is {last_n_match_win_rate:.2f}%."
-    )
+    if last_n_matches:
+        last_n_match_win_rate = analysis.calculate_match_win_rate(
+            player_name, tournament, last_n_matches, return_total=False
+        )
+        print(
+            f"Match win rate for {player_name} in the last {last_n_matches} matches is {last_n_match_win_rate:.2f}%."
+        )
 
-    last_n_match_game_win_rate, total_games = analysis.calculate_game_win_rate(
-        player_name, tournament, last_n_matches, return_total=True
-    )
-    print(
-        f"Game win rate for {player_name} in the last {last_n_matches} matches is {last_n_match_game_win_rate:.2f}% over {total_games} games."
-    )
+        last_n_match_game_win_rate, total_games = analysis.calculate_game_win_rate(
+            player_name, tournament, last_n_matches, return_total=True
+        )
+        print(
+            f"Game win rate for {player_name} in the last {last_n_matches} matches is {last_n_match_game_win_rate:.2f}% over {total_games} games."
+        )
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Tennis match analysis tool.")
+    parser.add_argument(
+        "player_name", type=str, help="The name of the player to analyze."
+    )
+    parser.add_argument(
+        "--last-n-matches",
+        default=None,
+        type=int,
+        help="The number of last matches to consider for analysis.",
+    )
+    args = parser.parse_args()
+    main(args.player_name, args.last_n_matches)
