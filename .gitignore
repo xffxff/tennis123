@@ -1,2 +1,3 @@
 .venv
 matches.json
+__pycache__

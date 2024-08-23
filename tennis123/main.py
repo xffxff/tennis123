@@ -3,38 +3,12 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+from tennis123.data import Match, Tournament
+from tennis123 import analysis
 
 BASE_URL = "https://www.tennis123.net"
 MATCH_URL = f"{BASE_URL}/member/match92575_Singles_r30"
 DATA_FILE = "matches.json"
-
-class Match:
-    def __init__(self, players, score, winner, info, start_time):
-        self.players = players
-        self.score = score
-        self.winner = winner
-        self.info = info
-        self.start_time = start_time
-
-    def __str__(self):
-        return f"match: {self.players}, score: {self.score}, winner: {self.winner}, info: {self.info}, start time: {self.start_time}"
-    
-class Tournament:
-    def __init__(self):
-        self.matches = []
-
-    def add_match(self, match):
-        self.matches.append(match)
-
-    def __iter__(self):
-        return iter(self.matches)
-
-    def __len__(self):
-        return len(self.matches)
-
-    def display_matches(self):
-        for match in self.matches:
-            print(match)
 
 
 def save_matches_to_file(matches, filename):
@@ -120,21 +94,6 @@ def extract_match_data(soup):
     
     return match_data
 
-def calculate_win_rate(player_name, tournament):
-    total_matches = 0
-    victories = 0
-
-    for match in tournament:
-        if player_name in match.players:
-            total_matches += 1
-            if match.winner == player_name:
-                victories += 1
-    
-    if total_matches == 0:
-        return 0.0
-    else:
-        return (victories / total_matches) * 100
-
 def main():
     tournament = Tournament()
 
@@ -158,8 +117,10 @@ def main():
     tournament.display_matches()
 
     player_name = "xffxff"
-    win_rate = calculate_win_rate(player_name, tournament)
-    print(f"{player_name}'s win rate: {win_rate:.2f}%")
+    match_win_rate = analysis.calculate_match_win_rate(player_name, tournament)
+    game_win_rate = analysis.calculate_game_win_rate(player_name, tournament)
+    print(f"Match win rate for {player_name}: {match_win_rate:.2f}%")
+    print(f"Game win rate for {player_name}: {game_win_rate:.2f}%")
 
 if __name__ == "__main__":
     main()
