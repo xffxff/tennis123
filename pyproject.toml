@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "tennis123"
+version = "0.1.0"
+description = ""
+authors = ["xffxff <1247714429@qq.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.32.3"
+beautifulsoup4 = "^4.12.3"
+
+[[tool.poetry.source]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+priority = "primary"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
