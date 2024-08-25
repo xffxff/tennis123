@@ -1,6 +1,6 @@
 import json
-from datetime import datetime
 import os
+from datetime import datetime
 
 import requests
 from bs4 import BeautifulSoup
@@ -127,4 +127,3 @@ def get_matches(player_name):
 
         save_matches_to_file(matches, cache_data_file)
     return matches
-
