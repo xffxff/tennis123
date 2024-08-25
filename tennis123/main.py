@@ -108,7 +108,6 @@ def extract_match_data(soup, player_name):
 
 def main(player_name, last_n_matches):
     tournament = Tournament()
-    player_name = "xffxff"
 
     user_id = get_user_id(player_name)
     match_url = f"{BASE_URL}/member/match{user_id}_Singles_r30"
