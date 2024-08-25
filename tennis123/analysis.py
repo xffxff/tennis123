@@ -1,7 +1,7 @@
 import re
 from typing import List
 
-from tennis123.data import Match, Tournament
+from tennis123.data import Match
 
 
 def count_game_wins_and_losses(matches: List[Match], player_name):
@@ -52,9 +52,9 @@ def sort_matches_by_start_time(matches, reverse=False):
 
 
 def calculate_match_win_rate(
-    player_name, tournament: Tournament, last_n_matches=None, return_total=False
+    player_name, matches: List[Match], last_n_matches=None, return_total=False
 ):
-    matches = sort_matches_by_start_time(tournament.matches)
+    matches = sort_matches_by_start_time(matches)
 
     if last_n_matches:
         matches = matches[-last_n_matches:]
@@ -66,9 +66,9 @@ def calculate_match_win_rate(
 
 
 def calculate_game_win_rate(
-    player_name, tournament: Tournament, last_n_matches=None, return_total=False
+    player_name, matches: List[Match], last_n_matches=None, return_total=False
 ):
-    matches = sort_matches_by_start_time(tournament.matches)
+    matches = sort_matches_by_start_time(matches)
 
     if last_n_matches:
         matches = matches[-last_n_matches:]
