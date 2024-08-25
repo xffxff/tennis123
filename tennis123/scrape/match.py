@@ -1,29 +1,34 @@
 import json
 import os
 from datetime import datetime
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup
 
-from tennis123.data import Match
+from tennis123.data import Match, MatchType
 from tennis123.scrape.user import get_user_id
 
 BASE_URL = "https://www.tennis123.net"
 
 
-def save_matches_to_file(matches, filename):
-    with open(filename, "w") as file:
-        json_matches = [
-            {
-                "players": match.players,
-                "score": match.score,
-                "winner": match.winner,
-                "info": match.info,
-                "start_time": match.start_time,
-            }
-            for match in matches
-        ]
-        json.dump(json_matches, file, ensure_ascii=False, indent=4)
+def save_matches_to_file(matches: List[Match], filename):
+    try:
+        with open(filename, "w") as file:
+            json_matches = [
+                {
+                    "players": match.players,
+                    "score": match.score,
+                    "winner": match.winner,
+                    "match_type": match.match_type.value,
+                    "start_time": match.start_time,
+                }
+                for match in matches
+            ]
+            json.dump(json_matches, file, ensure_ascii=False, indent=4)
+    except Exception as e:
+        print(f"Error saving matches to file: {e}")
+        os.remove(filename)
 
 
 def load_matches_from_file(filename):
@@ -34,7 +39,7 @@ def load_matches_from_file(filename):
                 match["players"],
                 match["score"],
                 match["winner"],
-                match["info"],
+                MatchType(match["match_type"]),
                 match["start_time"],
             )
             for match in json_matches
@@ -82,6 +87,19 @@ def extract_start_time(soup):
     return None
 
 
+def _get_match_type(s) -> MatchType:
+    if "小组赛" in s:
+        return MatchType.GROUP_STAGE
+    elif s == "1/4决赛":
+        return MatchType.QUARTER_FINAL
+    elif s == "半决赛":
+        return MatchType.SEMI_FINAL
+    elif s == "决赛":
+        return MatchType.FINAL
+    else:
+        return None
+
+
 def extract_match_data(soup, player_name):
     """Extracts match data from a match soup object."""
     start_time = extract_start_time(soup)
@@ -97,9 +115,9 @@ def extract_match_data(soup, player_name):
                 continue
             score = tds[1].get_text(strip=True)
             winner = tds[2].get_text(strip=True)
-            group_info = tds[4].get_text(strip=True)
+            match_type = _get_match_type(tds[4].get_text(strip=True))
 
-            match_data.append(Match(players, score, winner, group_info, start_time))
+            match_data.append(Match(players, score, winner, match_type, start_time))
 
     return match_data
 

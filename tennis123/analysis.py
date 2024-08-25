@@ -48,7 +48,11 @@ def _win_rate(wins, losses):
 
 
 def sort_matches_by_start_time(matches, reverse=False):
-    return sorted(matches, key=lambda match: match.start_time, reverse=reverse)
+    return sorted(
+        matches,
+        key=lambda match: (match.start_time, match.match_type.value),
+        reverse=reverse,
+    )
 
 
 def calculate_match_win_rate(
