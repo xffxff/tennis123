@@ -3,8 +3,6 @@ import argparse
 from tennis123 import analysis
 from tennis123.scrape.match import get_matches
 
-BASE_URL = "https://www.tennis123.net"
-
 
 def main(player_name, last_n_matches):
     matches = get_matches(player_name)
