@@ -2,7 +2,7 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from tennis123.analysis import count_match_wins_and_losses, sort_matches_by_start_time
+from tennis123.analysis import calculate_match_win_rate, sort_matches_by_start_time
 from tennis123.scrape.match import get_matches
 
 st.title("Tennis Match Outcomes")
@@ -14,12 +14,13 @@ matches = get_matches(player_name)
 matches = sort_matches_by_start_time(matches)
 
 if player_name:
-    wins, losses = count_match_wins_and_losses(matches, player_name)
+    match_win_rate, total_matches = calculate_match_win_rate(
+        player_name, matches, return_total=True
+    )
 
-    # Calculate win rate
-    win_rate = wins / (wins + losses) if (wins + losses) > 0 else 0
-
-    st.metric(label="Win Rate", value=f"{win_rate:.2%}")
+    st.text(
+        f"Match win rate for {player_name} is {match_win_rate:.2f}% over {total_matches} matches."
+    )
 
     outcomes = {"Match Number": list(range(1, len(matches) + 1)), "Outcome": []}
     for match in matches:

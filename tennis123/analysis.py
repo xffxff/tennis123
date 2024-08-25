@@ -59,6 +59,7 @@ def calculate_match_win_rate(
     player_name, matches: List[Match], last_n_matches=None, return_total=False
 ):
     matches = sort_matches_by_start_time(matches)
+    matches = filter_out_walkovers(matches)
 
     if last_n_matches:
         matches = matches[-last_n_matches:]
@@ -69,10 +70,15 @@ def calculate_match_win_rate(
     return _win_rate(wins, losses)
 
 
+def filter_out_walkovers(matches: List[Match]):
+    return [match for match in matches if "弃" not in match.score]
+
+
 def calculate_game_win_rate(
     player_name, matches: List[Match], last_n_matches=None, return_total=False
 ):
     matches = sort_matches_by_start_time(matches)
+    matches = filter_out_walkovers(matches)
 
     if last_n_matches:
         matches = matches[-last_n_matches:]
