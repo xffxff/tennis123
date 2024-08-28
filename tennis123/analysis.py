@@ -87,3 +87,30 @@ def calculate_game_win_rate(
     if return_total:
         return _win_rate(wins, losses), wins + losses
     return _win_rate(wins, losses)
+
+
+def calculate_tiebreak_win_rate(
+    player_name, matches: List[Match], last_n_matches=None, return_total=False
+):
+    matches = sort_matches_by_start_time(matches)
+    matches = filter_out_walkovers(matches)
+
+    if last_n_matches:
+        matches = matches[-last_n_matches:]
+
+    wins = 0
+    losses = 0
+
+    for match in matches:
+        if player_name in match.players:
+            if "(" in match.score:
+                print(match)
+                # if there is a tiebreak, the score will be in the format of 4-3(5)
+                if match.winner == player_name:
+                    wins += 1
+                else:
+                    losses += 1
+
+    if return_total:
+        return _win_rate(wins, losses), wins + losses
+    return _win_rate(wins, losses)

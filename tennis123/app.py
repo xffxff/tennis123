@@ -4,6 +4,7 @@ import streamlit as st
 
 from tennis123.analysis import (
     calculate_match_win_rate,
+    calculate_tiebreak_win_rate,
     count_game_wins_and_losses,
     filter_out_walkovers,
     sort_matches_by_start_time,
@@ -137,6 +138,14 @@ def main():
         st.subheader("Net Win-Loss")
 
         plot_net_win_loss_chart(df_net_win_loss, window_size)
+
+        st.subheader("Other Statistics")
+        tiebreak_win_rate, total_tiebreaks = calculate_tiebreak_win_rate(
+            player_name, matches, return_total=True
+        )
+        st.text(
+            f"Tiebreak win rate for {player_name} is {tiebreak_win_rate:.2f}% over {total_tiebreaks} tiebreaks."
+        )
 
 
 if __name__ == "__main__":
