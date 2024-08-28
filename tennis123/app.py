@@ -19,8 +19,14 @@ def get_player_name():
     return st.text_input("Enter player name:", "xffxff")
 
 
-def fetch_and_prepare_matches(player_name):
-    matches = get_matches(player_name)
+def get_match_level():
+    return st.selectbox(
+        "Choose match level:", ["2.5", "3.0", "3.5", "4.0", "4.5", "5.0"], index=1
+    )
+
+
+def fetch_and_prepare_matches(player_name, level):
+    matches = get_matches(player_name, level)
     matches = filter_out_walkovers(matches)
     return sort_matches_by_start_time(matches)
 
@@ -103,9 +109,11 @@ def plot_net_win_loss_chart(df_net_win_loss, window_size):
 def main():
     display_title()
     player_name = get_player_name()
+    match_level = get_match_level()
+    match_level = int(float(match_level) * 10)
 
     if player_name:
-        matches = fetch_and_prepare_matches(player_name)
+        matches = fetch_and_prepare_matches(player_name, match_level)
         df_outcomes, df_net_win_loss = calculate_statistics(player_name, matches)
 
         window_size = configure_window_size()

@@ -122,11 +122,11 @@ def extract_match_data(soup, player_name):
     return match_data
 
 
-def get_matches(player_name):
+def get_matches(player_name, level="30"):
     user_id = get_user_id(player_name)
-    match_url = f"{BASE_URL}/member/match{user_id}_Singles_r30"
+    match_url = f"{BASE_URL}/member/match{user_id}_Singles_r{level}"
 
-    cache_data_file = f"{player_name}_matches.json"
+    cache_data_file = f"{player_name}_{level}_matches.json"
     if os.path.exists(cache_data_file):
         print("Loading matches from local file...")
         matches = load_matches_from_file(cache_data_file)
